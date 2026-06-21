@@ -2,35 +2,24 @@
 
 Created by **Dewald Pretorius**.
 
-A read-only PowerShell toolkit for diagnosing Power Automate Desktop installation, runtime services, browser automation, cloud connectivity, and recent execution failures.
+A PowerShell 5.1 toolkit for diagnosing Power Automate Desktop installation, runtime services, browser automation, cloud connectivity, and recent execution failures.
 
-## Checks
+## Files
 
-- Power Automate Desktop and RPA processes
-- UIFlow service state
-- Store and Win32 installation evidence
-- Browser extension folders
-- Connectivity to Power Automate and Microsoft identity endpoints
-- Recent Application log events related to UIFlow and RPA components
+- `Microsoft_Power_Automate_Desktop_Troubleshooter.ps1` — read-only diagnostics and reports.
+- `Repair.ps1` — guarded local repair actions with pre-change evidence, confirmation, logging, backup, and verification.
 
-## Run
+## Repair actions
+
+- `Diagnose` — collects process, cache, service, and endpoint state.
+- `ResetCache` — requires Power Automate Desktop to be closed, then moves its local data folder to a timestamped backup and creates a clean folder.
+- `RestartService` — restarts `UIFlowService` and verifies that it returns to `Running`.
+- `FlushDns` — clears the Windows DNS client cache.
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\Microsoft_Power_Automate_Desktop_Troubleshooter.ps1"
+.\Repair.ps1 -Action Diagnose
+.\Repair.ps1 -Action ResetCache -WhatIf
+.\Repair.ps1 -Action RestartService -Confirm
 ```
 
-Reports are saved to `Desktop\Power_Automate_Desktop_Reports` as TXT and CSV.
-
-## Scenarios supported
-
-- Desktop console does not start
-- Flows fail at runtime
-- Browser automation does not attach
-- Selectors stop working after application changes
-- UIFlow service problems
-- Sign-in and cloud connectivity failures
-- Unattended or user-context execution differences
-
-## Safety
-
-The script does not modify flows, credentials, selectors, services, gateways, or browser extensions. It gathers evidence and recommends next steps.
+Service repair normally requires an elevated PowerShell session. The workflow is source-reviewed but has not been runtime-tested on every Power Automate Desktop version or unattended-runtime configuration.
